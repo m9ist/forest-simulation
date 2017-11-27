@@ -6,8 +6,10 @@ import ru.neolab.forest.flora.Hare;
 import ru.neolab.forest.flora.Wolf;
 import ru.neolab.forest.swing.Drozdov;
 
+import java.util.concurrent.TimeUnit;
+
 public class ForestSimulationLauncher {
-    public static void main(final String[] args) throws InterruptedException {
+    public static void main(final String[] args) throws InterruptedException, SanctuaryException {
         System.out.println("Hello world!");
 
         final WildlifeSanctuary wildlifeSanctuary = new WildlifeSanctuary(20, 10);
@@ -16,6 +18,6 @@ public class ForestSimulationLauncher {
         wildlifeSanctuary.addBeast(new Hare(new Coordinates(19, 9)));
 
         wildlifeSanctuary.addListener(new Drozdov(wildlifeSanctuary));
-        wildlifeSanctuary.start(5);
+        wildlifeSanctuary.start(100, TimeUnit.MILLISECONDS.toMillis(300));
     }
 }

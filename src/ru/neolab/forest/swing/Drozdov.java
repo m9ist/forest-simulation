@@ -42,7 +42,7 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
 
     @Override
     public void changed() {
-
+        repaint();
     }
 
     private final int OFFSET_FIELD = 10;

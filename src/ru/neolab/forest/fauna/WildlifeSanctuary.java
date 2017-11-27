@@ -4,9 +4,7 @@ import ru.neolab.forest.SanctuaryException;
 import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.flora.Beast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class WildlifeSanctuary {
@@ -25,7 +23,7 @@ public class WildlifeSanctuary {
             throw new SanctuaryException("Impossible " + from);
         }
         if (!checkIsPossible(to)) return false;
-        return Math.abs(from.x - to.x) <= 1 && Math.abs(to.x - to.y) <= 1;
+        return Math.abs(from.x - to.x) <= 1 && Math.abs(from.y - to.y) <= 1;
     }
 
     public Collection<Coordinates> getPossibleCoordinates() {
@@ -41,7 +39,7 @@ public class WildlifeSanctuary {
         return coordinates;
     }
 
-    public Collection<Coordinates> getPossibleMoves(final Coordinates from) throws SanctuaryException {
+    public List<Coordinates> getPossibleMoves(final Coordinates from) throws SanctuaryException {
         final LinkedList<Coordinates> coordinates = new LinkedList<>();
         for (int x = 0; x < xSize; x++) {
             for (int y = 0; y < ySize; y++) {
@@ -65,12 +63,19 @@ public class WildlifeSanctuary {
         beasts.add(beast);
     }
 
-    private void iteration() {
+    private void iteration() throws SanctuaryException {
+        final HashMap<Beast, Coordinates> newCoordinates = new HashMap<>();
+        for (final Beast beast : beasts) {
+            newCoordinates.put(beast, beast.chooseMove(this));
+        }
+        for (final Map.Entry<Beast, Coordinates> entry : newCoordinates.entrySet()) {
+            entry.getKey().move(entry.getValue(), this);
+        }
     }
 
-    public void start(final int iterations) throws InterruptedException {
+    public void start(final int iterations, final long delay) throws InterruptedException, SanctuaryException {
         for (int i = 0; i < iterations; i++) {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+            Thread.sleep(delay);
             iteration();
             for (final WildlifeSanctuaryListener listener : listeners) {
                 listener.changed();
