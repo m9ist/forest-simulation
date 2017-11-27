@@ -1,6 +1,8 @@
-package ru.neolab.forest;
+package ru.neolab.forest.fauna;
 
 import org.junit.Test;
+import ru.neolab.forest.fauna.Coordinates;
+import ru.neolab.forest.fauna.WildlifeSanctuary;
 
 import static org.junit.Assert.*;
 
