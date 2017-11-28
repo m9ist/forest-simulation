@@ -5,4 +5,9 @@ public class Wolf extends Beast {
         super();
         speed = 2;
     }
+
+    @Override
+    protected Beast getChildren() {
+        return new Wolf();
+    }
 }

@@ -56,7 +56,7 @@ public class WildlifeSanctuary {
                 && coordinates.y < ySize;
     }
 
-    public final Collection<Coordinates> getPossibleCoordinates() {
+    public final List<Coordinates> getPossibleCoordinates() {
         final LinkedList<Coordinates> coordinates = new LinkedList<>();
         for (int x = 0; x < xSize; x++) {
             for (int y = 0; y < ySize; y++) {

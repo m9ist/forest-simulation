@@ -32,6 +32,21 @@ public abstract class Event {
         }
     }
 
+    public static class BeastBeBorn extends Event{
+        final Beast beast;
+        final Coordinates coordinates;
+
+        public BeastBeBorn(final Beast beast, final Coordinates coordinates) {
+            this.beast = beast;
+            this.coordinates = coordinates;
+        }
+
+        @Override
+        void apply(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
+            wildlifeSanctuary.addBeast(beast, coordinates);
+        }
+    }
+
     abstract void apply(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException;
 
     @Override
