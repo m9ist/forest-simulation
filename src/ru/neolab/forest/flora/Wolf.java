@@ -10,4 +10,9 @@ public class Wolf extends Beast {
     protected Beast getChildren() {
         return new Wolf();
     }
+
+    @Override
+    public double getNeededKilocaloriesAmount() {
+        throw new RuntimeException("Not implemented");
+    }
 }

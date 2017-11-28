@@ -74,6 +74,12 @@ public abstract class Beast {
         return hunger;
     }
 
+    public abstract double getNeededKilocaloriesAmount();
+
+    public void kilocaloriesAte(final double kilocalories) {
+        hunger += (1 - hunger) * kilocalories / getNeededKilocaloriesAmount();
+    }
+
     public boolean isDead() {
         return hunger < 1e-8;
     }

@@ -2,6 +2,7 @@ package ru.neolab.forest.swing;
 
 import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.fauna.Coordinates;
+import ru.neolab.forest.fauna.Grass;
 import ru.neolab.forest.fauna.WildlifeSanctuary;
 import ru.neolab.forest.flora.Beast;
 import ru.neolab.forest.flora.Hare;
@@ -95,6 +96,11 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
                 width,
                 height
         );
+        // рисуем травку
+        final Grass grass = wildlifeSanctuary.getGrass(coordinate);
+        g2.setColor(getGrassColor(grass.getPercentageOfAbsoluteMax()));
+        g2.fillRect(x, y, width, height);
+
         // потом рисуем пацанов, которые там обитают
         final Collection<Beast> beasts = wildlifeSanctuary.getBeasts(coordinate);
         for (final Beast beast : beasts) {
@@ -113,5 +119,11 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
             }
             g2.drawImage(image, x + OFFSET_CELLS, y + OFFSET_CELLS, width, height, null);
         }
+    }
+
+    protected static Color getGrassColor(final double percentageFromMax) {
+        final int redBlue = Math.max(0, (int) (255 * (0.05 - percentageFromMax) / 0.05));
+        final int green = (int) (80 + 175 * (1 - percentageFromMax));
+        return new Color(redBlue, green, redBlue);
     }
 }

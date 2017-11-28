@@ -32,7 +32,7 @@ public abstract class Event {
         }
     }
 
-    public static class BeastBeBorn extends Event{
+    public static class BeastBeBorn extends Event {
         final Beast beast;
         final Coordinates coordinates;
 
@@ -44,6 +44,21 @@ public abstract class Event {
         @Override
         void apply(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
             wildlifeSanctuary.addBeast(beast, coordinates);
+        }
+    }
+
+    static class BeastAte extends Event {
+        final Beast beast;
+        final double kilocalories;
+
+        BeastAte(final Beast beast, final double kilocalories) {
+            this.beast = beast;
+            this.kilocalories = kilocalories;
+        }
+
+        @Override
+        void apply(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
+            wildlifeSanctuary.beastAte(beast, kilocalories);
         }
     }
 

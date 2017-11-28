@@ -13,7 +13,7 @@ public class ForestSimulationLauncher {
         final WildlifeSanctuary wildlifeSanctuary = new WildlifeSanctuary(50, 20);
         final List<Coordinates> possibleCoordinates = wildlifeSanctuary.getPossibleCoordinates();
         final int numWolfs = 3;
-        final int numHares = 5;
+        final int numHares = 20;
         for (int i = 0; i < numWolfs; i++) {
             wildlifeSanctuary.addBeast(new Wolf(), possibleCoordinates.get((int) (Math.random() * possibleCoordinates.size())));
         }
@@ -22,6 +22,6 @@ public class ForestSimulationLauncher {
         }
 
         wildlifeSanctuary.addListener(new Drozdov(wildlifeSanctuary));
-        wildlifeSanctuary.startSimulations(100);
+        wildlifeSanctuary.startSimulations(300);
     }
 }

@@ -3,6 +3,7 @@ package ru.neolab.forest.fauna;
 import ru.neolab.forest.SanctuaryException;
 import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.flora.Beast;
+import ru.neolab.forest.flora.Hare;
 
 import java.util.*;
 
@@ -10,12 +11,16 @@ public class WildlifeSanctuary {
     private final int ySize;
     private final int xSize;
     private final HashMap<Beast, BeastSanctuaryState> beasts = new HashMap<>();
+    private final HashMap<Coordinates, Grass> grasses = new HashMap<>();
     private final ArrayList<WildlifeSanctuaryListener> listeners = new ArrayList<>();
     private final ArrayList<Event> events = new ArrayList<>();
 
     public WildlifeSanctuary(final int xSize, final int ySize) {
         this.ySize = ySize;
         this.xSize = xSize;
+        for (final Coordinates coordinates : getPossibleCoordinates()) {
+            grasses.put(coordinates, new Grass());
+        }
     }
 
     public void startSimulations(final int iterations) throws InterruptedException, SanctuaryException {
@@ -101,6 +106,28 @@ public class WildlifeSanctuary {
             if (beast.isDead()) continue;
             beast.chooseMove(this);
         }
+        for (final Coordinates coordinate : grasses.keySet()) {
+            final Collection<Beast> beasts = getBeasts(coordinate);
+            final Grass grass = grasses.get(coordinate);
+            beasts.removeIf(beast -> !(beast instanceof Hare));
+            if (beasts.size() > 0) {
+                final double kilocalories = grass.getKilocalories();
+                double needKkal = 0;
+                for (final Beast beast : beasts) {
+                    needKkal += beast.getNeededKilocaloriesAmount();
+                }
+                final double kilocaloriesAte = Math.min(needKkal, kilocalories);
+                grass.stepDone(kilocaloriesAte);
+                if (needKkal > 1e-8) {
+                    for (final Beast beast : beasts) {
+                        addEvent(new Event.BeastAte(beast, kilocaloriesAte * beast.getNeededKilocaloriesAmount() / needKkal));
+                        beast.getNeededKilocaloriesAmount();
+                    }
+                }
+            } else {
+                grass.stepDone(0);
+            }
+        }
         // меняем этот мир....
         for (final Event event : events) {
             event.apply(this);
@@ -130,6 +157,10 @@ public class WildlifeSanctuary {
         beasts.get(beast).isDead = true;
     }
 
+    void beastAte(final Beast beast, final double kilocalories) {
+        beast.kilocaloriesAte(kilocalories);
+    }
+
     //----------------------------------- для прорисовки мира
 
     /**
@@ -143,5 +174,9 @@ public class WildlifeSanctuary {
             }
         }
         return out;
+    }
+
+    public Grass getGrass(final Coordinates coordinate) {
+        return grasses.get(coordinate);
     }
 }
