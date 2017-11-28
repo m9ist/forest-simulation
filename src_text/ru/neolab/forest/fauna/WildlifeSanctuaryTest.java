@@ -1,10 +1,9 @@
 package ru.neolab.forest.fauna;
 
 import org.junit.Test;
-import ru.neolab.forest.fauna.Coordinates;
-import ru.neolab.forest.fauna.WildlifeSanctuary;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class WildlifeSanctuaryTest {
     @Test

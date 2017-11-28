@@ -18,6 +18,6 @@ public class ForestSimulationLauncher {
         wildlifeSanctuary.addBeast(new Hare(), new Coordinates(19, 9));
 
         wildlifeSanctuary.addListener(new Drozdov(wildlifeSanctuary));
-        wildlifeSanctuary.start(100, TimeUnit.MILLISECONDS.toMillis(300));
+        wildlifeSanctuary.startSimulations(100, TimeUnit.MILLISECONDS.toMillis(300));
     }
 }

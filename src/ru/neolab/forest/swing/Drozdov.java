@@ -1,8 +1,8 @@
 package ru.neolab.forest.swing;
 
+import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.fauna.Coordinates;
 import ru.neolab.forest.fauna.WildlifeSanctuary;
-import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.flora.Beast;
 
 import javax.swing.*;
@@ -48,7 +48,8 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
     private final int OFFSET_FIELD = 10;
     private final int OFFSET_CELLS = 2;
     private static final Color GRID_COLOR = Color.LIGHT_GRAY;
-    private static final Color TEXT_COLOR = Color.RED;
+    private static final Color TEXT_COLOR_DEAD = Color.RED;
+    private static final Color TEXT_COLOR_ALIVE = Color.BLACK;
 
     @Override
     public void paint(final Graphics g) {
@@ -80,9 +81,9 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
                 stepY - OFFSET_CELLS * 2
         );
         // потом рисуем пацанов, которые там обитают
-        g2.setColor(TEXT_COLOR);
         final Collection<Beast> beasts = wildlifeSanctuary.getBeasts(coordinate);
         for (final Beast beast : beasts) {
+            g2.setColor(beast.isDead() ? TEXT_COLOR_DEAD : TEXT_COLOR_ALIVE);
             g2.drawString(beast.toString(), x + OFFSET_CELLS, y + stepY / 2);
         }
     }

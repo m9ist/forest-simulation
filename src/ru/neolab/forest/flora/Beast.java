@@ -2,6 +2,7 @@ package ru.neolab.forest.flora;
 
 import ru.neolab.forest.SanctuaryException;
 import ru.neolab.forest.fauna.Coordinates;
+import ru.neolab.forest.fauna.Event;
 import ru.neolab.forest.fauna.WildlifeSanctuary;
 
 import java.util.List;
@@ -9,6 +10,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Beast {
     private final String beastId;
+    /**
+     * Степень "голодности" индивидума.
+     * 0.0 и меньше - смерть
+     * 1.0 - сытость
+     */
+    protected double hunger = 1.0;
+    protected double speed = 1.0;
     private final static AtomicInteger beastCounter = new AtomicInteger(0);
 
     Beast() {
@@ -17,7 +25,9 @@ public abstract class Beast {
 
     @Override
     public String toString() {
-        return beastId;
+        return isDead()
+                ? "X_X " + beastId
+                : beastId;
     }
 
     @Override
@@ -35,8 +45,21 @@ public abstract class Beast {
         return beastId.hashCode();
     }
 
+    public boolean isDead() {
+        return hunger < -1e-8;
+    }
+
     public void chooseMove(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
-        final List<Coordinates> possibleMoves = wildlifeSanctuary.getPossibleMoves(wildlifeSanctuary.whereBeast(this));
-        wildlifeSanctuary.goingToMove(this, possibleMoves.get((int) (Math.random() * possibleMoves.size())));
+        hunger -= 0.1;
+        if (isDead()) {
+            wildlifeSanctuary.addEvent(new Event.BeastDead(this));
+            return;
+        }
+        final List<Coordinates> possibleMoves = wildlifeSanctuary.getPossibleMoves(wildlifeSanctuary.whereBeast(this), speed);
+        wildlifeSanctuary.addEvent(new Event.BeastMove(this, possibleMoves.get((int) (Math.random() * possibleMoves.size()))));
+    }
+
+    public double getSpeed() {
+        return speed;
     }
 }
