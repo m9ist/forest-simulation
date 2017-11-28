@@ -112,6 +112,10 @@ public abstract class Beast {
                 femaleBeast.stepsToWantSex = 5;
             }
         }
+        chooseMoveBeastAlgorithm(wildlifeSanctuary);
+    }
+
+    protected void chooseMoveBeastAlgorithm(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
         final List<Coordinates> possibleMoves = wildlifeSanctuary.getPossibleMoves(wildlifeSanctuary.whereBeast(this), speed);
         wildlifeSanctuary.addEvent(new Event.BeastMove(this, possibleMoves.get((int) (Math.random() * possibleMoves.size()))));
     }

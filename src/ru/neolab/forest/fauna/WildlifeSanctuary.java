@@ -4,6 +4,7 @@ import ru.neolab.forest.SanctuaryException;
 import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.flora.Beast;
 import ru.neolab.forest.flora.Hare;
+import ru.neolab.forest.flora.Wolf;
 
 import java.util.*;
 
@@ -106,21 +107,29 @@ public class WildlifeSanctuary {
             if (beast.isDead()) continue;
             beast.chooseMove(this);
         }
+        final ArrayList<Beast> wolfs = new ArrayList<>(beasts.keySet());
+        wolfs.removeIf(beast -> beast.isDead() || !(beast instanceof Wolf));
+        for (final Beast wolf : wolfs) {
+            final List<Hare> beasts = getAliveBeast(whereBeast(wolf), Hare.class);
+            if (beasts.size() == 0) continue;
+            final Hare ateHare = beasts.get((int) (beasts.size() * Math.random()));
+            events.add(new Event.BeastAte(wolf, ateHare.getKilocalories()));
+            beasts.remove(ateHare);
+        }
         for (final Coordinates coordinate : grasses.keySet()) {
-            final Collection<Beast> beasts = getBeasts(coordinate);
+            final Collection<Hare> beasts = getAliveBeast(coordinate, Hare.class);
             final Grass grass = grasses.get(coordinate);
-            beasts.removeIf(beast -> !(beast instanceof Hare));
             if (beasts.size() > 0) {
                 final double kilocalories = grass.getKilocalories();
-                double needKkal = 0;
+                double needKcal = 0;
                 for (final Beast beast : beasts) {
-                    needKkal += beast.getNeededKilocaloriesAmount();
+                    needKcal += beast.getNeededKilocaloriesAmount();
                 }
-                final double kilocaloriesAte = Math.min(needKkal, kilocalories);
+                final double kilocaloriesAte = Math.min(needKcal, kilocalories);
                 grass.stepDone(kilocaloriesAte);
-                if (needKkal > 1e-8) {
+                if (needKcal > 1e-8) {
                     for (final Beast beast : beasts) {
-                        addEvent(new Event.BeastAte(beast, kilocaloriesAte * beast.getNeededKilocaloriesAmount() / needKkal));
+                        addEvent(new Event.BeastAte(beast, kilocaloriesAte * beast.getNeededKilocaloriesAmount() / needKcal));
                         beast.getNeededKilocaloriesAmount();
                     }
                 }
@@ -130,6 +139,7 @@ public class WildlifeSanctuary {
         }
         // меняем этот мир....
         for (final Event event : events) {
+            if (event.beast.isDead()) continue;
             event.apply(this);
         }
         events.clear();
@@ -141,6 +151,10 @@ public class WildlifeSanctuary {
 
     public Coordinates whereBeast(final Beast beast) {
         return beasts.get(beast).coordinates;
+    }
+
+    public double getDistance(final Coordinates c1, final Coordinates c2) {
+        return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
     }
 
     //----------------------------------- реализация применения накопленных решений изменений мира
@@ -166,7 +180,7 @@ public class WildlifeSanctuary {
     /**
      * Получить животных в этой ячейке мира
      */
-    public Collection<Beast> getBeasts(final Coordinates coordinate) {
+    public List<Beast> getBeasts(final Coordinates coordinate) {
         final ArrayList<Beast> out = new ArrayList<>();
         for (final BeastSanctuaryState beastSanctuaryState : beasts.values()) {
             if (beastSanctuaryState.coordinates.equals(coordinate)) {
@@ -174,6 +188,17 @@ public class WildlifeSanctuary {
             }
         }
         return out;
+    }
+
+    public <K extends Beast> List<K> getAliveBeast(final Coordinates coordinate, final Class<K> kClass) {
+        final List<Beast> beasts = getBeasts(coordinate);
+        final ArrayList<K> hares = new ArrayList<>();
+        for (final Beast beast : beasts) {
+            if (beast.getClass() == kClass && !beast.isDead()) {
+                hares.add((K) beast);
+            }
+        }
+        return hares;
     }
 
     public Grass getGrass(final Coordinates coordinate) {

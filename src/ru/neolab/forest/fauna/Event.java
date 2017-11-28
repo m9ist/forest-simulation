@@ -4,12 +4,17 @@ import ru.neolab.forest.SanctuaryException;
 import ru.neolab.forest.flora.Beast;
 
 public abstract class Event {
+    final Beast beast;
+
+    Event(final Beast beast) {
+        this.beast = beast;
+    }
+
     public static class BeastMove extends Event {
-        final Beast beast;
         final Coordinates to;
 
         public BeastMove(final Beast beast, final Coordinates to) {
-            this.beast = beast;
+            super(beast);
             this.to = to;
         }
 
@@ -20,10 +25,8 @@ public abstract class Event {
     }
 
     public static class BeastDead extends Event {
-        final Beast beast;
-
         public BeastDead(final Beast beast) {
-            this.beast = beast;
+            super(beast);
         }
 
         @Override
@@ -33,11 +36,10 @@ public abstract class Event {
     }
 
     public static class BeastBeBorn extends Event {
-        final Beast beast;
         final Coordinates coordinates;
 
         public BeastBeBorn(final Beast beast, final Coordinates coordinates) {
-            this.beast = beast;
+            super(beast);
             this.coordinates = coordinates;
         }
 
@@ -48,11 +50,10 @@ public abstract class Event {
     }
 
     static class BeastAte extends Event {
-        final Beast beast;
         final double kilocalories;
 
         BeastAte(final Beast beast, final double kilocalories) {
-            this.beast = beast;
+            super(beast);
             this.kilocalories = kilocalories;
         }
 

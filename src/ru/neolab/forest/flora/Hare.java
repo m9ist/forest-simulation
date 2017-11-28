@@ -18,4 +18,11 @@ public class Hare extends Beast {
     public double getNeededKilocaloriesAmount() {
         return Math.max(0, (1 - getHunger()) * 300);
     }
+
+    /**
+     * —колько дает сожранный за€ц волку
+     */
+    public double getKilocalories() {
+        return 1_000;
+    }
 }
