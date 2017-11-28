@@ -18,9 +18,8 @@ public class WildlifeSanctuary {
         this.xSize = xSize;
     }
 
-    public void startSimulations(final int iterations, final long delay) throws InterruptedException, SanctuaryException {
+    public void startSimulations(final int iterations) throws InterruptedException, SanctuaryException {
         for (int i = 0; i < iterations; i++) {
-            Thread.sleep(delay);
             iteration();
             for (final WildlifeSanctuaryListener listener : listeners) {
                 listener.changed();

@@ -24,7 +24,7 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
         frame.setVisible(true);
 
         calcPossibleCoordinates();
-        changed();
+        repaint();
     }
 
     private int minX = Integer.MAX_VALUE;
@@ -42,25 +42,34 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
         }
     }
 
+    private static long lastStateUpdate = 0L;
+
     @Override
-    public void changed() {
+    public void changed() throws InterruptedException {
         repaint();
+        final long currentTime = System.currentTimeMillis();
+        final long l = 200L;
+        if (currentTime < lastStateUpdate + l) {
+            final long sleep = Math.max(l - Math.min(currentTime - lastStateUpdate, l), 0L);
+            Thread.sleep(sleep);
+        }
+        lastStateUpdate = System.currentTimeMillis();
     }
 
-    private static final int OFFSET_FIELD = 10;
-    private static final int OFFSET_CELLS = 2;
+    private static final int OFFSET_FIELD = 3;
+    private static final int OFFSET_CELLS = 1;
     private static final int LIFE_BAR_OFFSET = 1;
     private static final Color GRID_COLOR = Color.LIGHT_GRAY;
-    private static final Color TEXT_COLOR_DEAD = Color.RED;
-    private static final Color TEXT_COLOR_ALIVE = Color.BLACK;
+    private static final Color COLOR_FEMALE = Color.RED;
+    private static final Color COLOR_MALE = Color.BLACK;
 
     @Override
     public void paint(final Graphics g) {
         final Graphics2D g2 = (Graphics2D) g;
         final int originWidth = getWidth();
         final int height = getHeight();
-        final int stepX = (originWidth - OFFSET_FIELD) / (maxX - minX + 1) - OFFSET_CELLS / 2;
-        final int stepY = (height - OFFSET_FIELD) / (maxY - minY + 1) - OFFSET_CELLS / 2;
+        final double stepX = (originWidth - OFFSET_FIELD * 2) * 1.0 / (maxX - minX + 1);
+        final double stepY = (height - OFFSET_FIELD * 2) * 1.0 / (maxY - minY + 1);
 
         final Collection<Coordinates> possibleCoordinates = wildlifeSanctuary.getPossibleCoordinates();
         for (final Coordinates coordinate : possibleCoordinates) {
@@ -72,14 +81,14 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
         }
     }
 
-    private void drawCell(final Coordinates coordinate, final int stepX, final int stepY, final Graphics2D g2) {
+    private void drawCell(final Coordinates coordinate, final double stepX, final double stepY, final Graphics2D g2) {
         // сначала рисуем само поле
         g2.setStroke(new BasicStroke(1));
         g2.setColor(GRID_COLOR);
-        final int x = OFFSET_FIELD / 2 + stepX * coordinate.x + OFFSET_CELLS;
-        final int y = OFFSET_FIELD / 2 + stepY * coordinate.y + OFFSET_CELLS;
-        final int width = stepX - OFFSET_CELLS * 2;
-        final int height = stepY - OFFSET_CELLS * 2;
+        final int x = (int) (OFFSET_FIELD + stepX * coordinate.x + OFFSET_CELLS);
+        final int y = (int) (OFFSET_FIELD + stepY * coordinate.y + OFFSET_CELLS);
+        final int width = (int) (stepX - OFFSET_CELLS * 2);
+        final int height = (int) (stepY - OFFSET_CELLS * 2);
         g2.drawRect(
                 x,
                 y,
@@ -89,23 +98,20 @@ public class Drozdov extends JComponent implements WildlifeSanctuaryListener {
         // потом рисуем пацанов, которые там обитают
         final Collection<Beast> beasts = wildlifeSanctuary.getBeasts(coordinate);
         for (final Beast beast : beasts) {
-            g2.setColor(TEXT_COLOR_ALIVE);
-            g2.setStroke(new BasicStroke(3));
-            g2.drawLine(x + OFFSET_CELLS, y + OFFSET_CELLS + LIFE_BAR_OFFSET, (int) (x + OFFSET_CELLS + width * beast.getHunger()), y + OFFSET_CELLS + LIFE_BAR_OFFSET);
+            if (!beast.isDead()) {
+                g2.setColor(beast.isMale() ? COLOR_MALE : COLOR_FEMALE);
+                g2.setStroke(new BasicStroke(3));
+                g2.drawLine(x + OFFSET_CELLS, y + OFFSET_CELLS + LIFE_BAR_OFFSET, (int) (x + OFFSET_CELLS + width * beast.getHunger()), y + OFFSET_CELLS + LIFE_BAR_OFFSET);
+            }
             final Image image;
             if (beast.getClass() == Wolf.class) {
                 image = new ImageIcon(Drozdov.class.getResource("/icons8-¬олк-50.png")).getImage();
             } else if (beast.getClass() == Hare.class) {
                 image = new ImageIcon(Drozdov.class.getResource("/icons8- ролик-48.png")).getImage();
             } else {
-                image = null;
+                throw new RuntimeException("Doesn't support " + beast.getClass().getCanonicalName());
             }
-            if (image == null) {
-                g2.setColor(beast.isDead() ? TEXT_COLOR_DEAD : TEXT_COLOR_ALIVE);
-                g2.drawString(beast.toString(), x + OFFSET_CELLS, y + stepY / 2);
-            } else {
-                g2.drawImage(image, x + OFFSET_CELLS, y + OFFSET_CELLS, width, height, null);
-            }
+            g2.drawImage(image, x + OFFSET_CELLS, y + OFFSET_CELLS, width, height, null);
         }
     }
 }

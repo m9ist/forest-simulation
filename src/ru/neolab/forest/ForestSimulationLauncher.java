@@ -7,11 +7,10 @@ import ru.neolab.forest.flora.Wolf;
 import ru.neolab.forest.swing.Drozdov;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class ForestSimulationLauncher {
     public static void main(final String[] args) throws InterruptedException, SanctuaryException {
-        final WildlifeSanctuary wildlifeSanctuary = new WildlifeSanctuary(20, 10);
+        final WildlifeSanctuary wildlifeSanctuary = new WildlifeSanctuary(50, 20);
         final List<Coordinates> possibleCoordinates = wildlifeSanctuary.getPossibleCoordinates();
         final int numWolfs = 3;
         final int numHares = 5;
@@ -23,6 +22,6 @@ public class ForestSimulationLauncher {
         }
 
         wildlifeSanctuary.addListener(new Drozdov(wildlifeSanctuary));
-        wildlifeSanctuary.startSimulations(100, TimeUnit.MILLISECONDS.toMillis(300));
+        wildlifeSanctuary.startSimulations(100);
     }
 }

@@ -20,6 +20,13 @@ public abstract class Beast {
     private double hunger = 1.0;
     double speed = 1.0;
     private final static AtomicInteger beastCounter = new AtomicInteger(0);
+    private static final double HUNGER_STATE_TO_REPRODUCTION = 0.6;
+    private static final double HUNGER_LOOSE_PER_STEP = 0.07;
+
+    public boolean isMale() {
+        return male;
+    }
+
     /**
      * Нетолерантность в чистом виде, задо оптимально. Мужик - true, деваха - ytn.
      */
@@ -70,9 +77,6 @@ public abstract class Beast {
     public boolean isDead() {
         return hunger < 1e-8;
     }
-
-    private static final double HUNGER_STATE_TO_REPRODUCTION = 0.6;
-    private static final double HUNGER_LOOSE_PER_STEP = 0.01;
 
     public void chooseMove(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
         hunger = Math.max(0, hunger - HUNGER_LOOSE_PER_STEP);
