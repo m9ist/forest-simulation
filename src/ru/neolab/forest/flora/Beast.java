@@ -15,8 +15,8 @@ public abstract class Beast {
      * 0.0 и меньше - смерть
      * 1.0 - сытость
      */
-    protected double hunger = 1.0;
-    protected double speed = 1.0;
+    private double hunger = 1.0;
+    double speed = 1.0;
     private final static AtomicInteger beastCounter = new AtomicInteger(0);
 
     Beast() {
@@ -45,12 +45,16 @@ public abstract class Beast {
         return beastId.hashCode();
     }
 
+    public double getHunger() {
+        return hunger;
+    }
+
     public boolean isDead() {
-        return hunger < -1e-8;
+        return hunger < 1e-8;
     }
 
     public void chooseMove(final WildlifeSanctuary wildlifeSanctuary) throws SanctuaryException {
-        hunger -= 0.1;
+        hunger = Math.max(0, hunger - 0.1);
         if (isDead()) {
             wildlifeSanctuary.addEvent(new Event.BeastDead(this));
             return;
