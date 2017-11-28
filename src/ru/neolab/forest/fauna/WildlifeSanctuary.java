@@ -5,12 +5,11 @@ import ru.neolab.forest.WildlifeSanctuaryListener;
 import ru.neolab.forest.flora.Beast;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class WildlifeSanctuary {
     private final int ySize;
     private final int xSize;
-    private final ArrayList<Beast> beasts = new ArrayList<>();
+    private final HashMap<Beast, Coordinates> beasts = new HashMap<>();
     private final ArrayList<WildlifeSanctuaryListener> listeners = new ArrayList<>();
 
     public WildlifeSanctuary(final int xSize, final int ySize) {
@@ -18,12 +17,13 @@ public class WildlifeSanctuary {
         this.xSize = xSize;
     }
 
-    public boolean possibleMove(final Coordinates from, final Coordinates to) throws SanctuaryException {
+    private boolean possibleMove(final Coordinates from, final Coordinates to) throws SanctuaryException {
         if (!checkIsPossible(from)) {
             throw new SanctuaryException("Impossible " + from);
         }
-        if (!checkIsPossible(to)) return false;
-        return Math.abs(from.x - to.x) <= 1 && Math.abs(from.y - to.y) <= 1;
+        return checkIsPossible(to)
+                && Math.abs(from.x - to.x) <= 1
+                && Math.abs(from.y - to.y) <= 1;
     }
 
     public Collection<Coordinates> getPossibleCoordinates() {
@@ -52,25 +52,31 @@ public class WildlifeSanctuary {
         return coordinates;
     }
 
-    public boolean checkIsPossible(final Coordinates coordinates) {
+    boolean checkIsPossible(final Coordinates coordinates) {
         return coordinates.x >= 0
                 && coordinates.x < xSize
                 && coordinates.y >= 0
                 && coordinates.y < ySize;
     }
 
-    public void addBeast(final Beast beast) {
-        beasts.add(beast);
+    public void addBeast(final Beast beast, final Coordinates coordinates) {
+        beasts.put(beast, coordinates);
     }
 
+    private final ArrayList<Event> events = new ArrayList<>();
+
     private void iteration() throws SanctuaryException {
-        final HashMap<Beast, Coordinates> newCoordinates = new HashMap<>();
-        for (final Beast beast : beasts) {
-            newCoordinates.put(beast, beast.chooseMove(this));
+        if (!events.isEmpty()) {
+            throw new SanctuaryException("Not empty state");
         }
-        for (final Map.Entry<Beast, Coordinates> entry : newCoordinates.entrySet()) {
-            entry.getKey().move(entry.getValue(), this);
+        for (final Beast beast : beasts.keySet()) {
+            beast.chooseMove(this);
         }
+        // меняем этот мир....
+        for (final Event event : events) {
+            event.apply(this);
+        }
+        events.clear();
     }
 
     public void start(final int iterations, final long delay) throws InterruptedException, SanctuaryException {
@@ -89,11 +95,30 @@ public class WildlifeSanctuary {
 
     public Collection<Beast> getBeasts(final Coordinates coordinate) {
         final ArrayList<Beast> out = new ArrayList<>();
-        for (final Beast beast : beasts) {
-            if (beast.getCoordinates().equals(coordinate)) {
-                out.add(beast);
+        for (final Map.Entry<Beast, Coordinates> entry : beasts.entrySet()) {
+            if (entry.getValue().equals(coordinate)) {
+                out.add(entry.getKey());
             }
         }
         return out;
+    }
+
+    public void goingToMove(final Beast beast, final Coordinates to) throws SanctuaryException {
+        if (!possibleMove(whereBeast(beast), to)) {
+            throw new SanctuaryException("Can't move " + beast + " to " + to);
+        }
+        events.add(new Event.BeastMove(beast, to));
+    }
+
+    public Coordinates whereBeast(final Beast beast) {
+        return beasts.get(beast);
+    }
+
+    void moveBeast(final Beast beast, final Coordinates to) throws SanctuaryException {
+        final Coordinates from = beasts.get(beast);
+        if (!possibleMove(from, to)) {
+            throw new SanctuaryException("Can't move " + beast + " to " + to);
+        }
+        beasts.put(beast, to);
     }
 }

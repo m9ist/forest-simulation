@@ -13,9 +13,9 @@ public class ForestSimulationLauncher {
         System.out.println("Hello world!");
 
         final WildlifeSanctuary wildlifeSanctuary = new WildlifeSanctuary(20, 10);
-        wildlifeSanctuary.addBeast(new Wolf(new Coordinates(0, 0)));
-        wildlifeSanctuary.addBeast(new Wolf(new Coordinates(15, 7)));
-        wildlifeSanctuary.addBeast(new Hare(new Coordinates(19, 9)));
+        wildlifeSanctuary.addBeast(new Wolf(), new Coordinates(0, 0));
+        wildlifeSanctuary.addBeast(new Wolf(), new Coordinates(15, 7));
+        wildlifeSanctuary.addBeast(new Hare(), new Coordinates(19, 9));
 
         wildlifeSanctuary.addListener(new Drozdov(wildlifeSanctuary));
         wildlifeSanctuary.start(100, TimeUnit.MILLISECONDS.toMillis(300));
