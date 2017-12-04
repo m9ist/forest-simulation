@@ -7,11 +7,12 @@ import ru.neolab.forest.flora.Hare;
 import ru.neolab.forest.flora.Wolf;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WildlifeSanctuary {
     private final int ySize;
     private final int xSize;
-    private final HashMap<Beast, BeastSanctuaryState> beasts = new HashMap<>();
+    private final ConcurrentHashMap<Beast, BeastSanctuaryState> beasts = new ConcurrentHashMap<>();
     private final HashMap<Coordinates, Grass> grasses = new HashMap<>();
     private final ArrayList<WildlifeSanctuaryListener> listeners = new ArrayList<>();
     private final ArrayList<Event> events = new ArrayList<>();
@@ -135,6 +136,22 @@ public class WildlifeSanctuary {
                 }
             } else {
                 grass.stepDone(0);
+            }
+        }
+        // воспроизводство травы после того как ее всю съели
+        for (final Coordinates coordinate : grasses.keySet()) {
+            final Grass grass = grasses.get(coordinate);
+            if (grass.getKilocalories() <= 0) {
+                final List<Coordinates> possibleParentGrass = getPossibleMoves(coordinate, 1);
+                int numPossibleParents = 0;
+                for (final Coordinates coordWithGrass : possibleParentGrass) {
+                    final Grass parentGrass = grasses.get(coordWithGrass);
+                    if (parentGrass.isGoodForReproduction()) {
+                        numPossibleParents++;
+                    }
+                }
+
+                grass.growGrass(numPossibleParents);
             }
         }
         // меняем этот мир....

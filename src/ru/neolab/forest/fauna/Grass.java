@@ -18,6 +18,12 @@ public class Grass {
         kilocalories = Math.max(0, Math.min(kilocalories + kilocaloriesPerIteration - kilocaloriesAte, maxKilocalories));
     }
 
+    void growGrass(final double powerGrow) {
+        if (powerGrow > 0) {
+            kilocalories = maxKilocalories * (powerGrow / 8);
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("%s(%.1f) - %.1f", getClass().getSimpleName(), kilocaloriesPerIteration, kilocalories);
@@ -25,5 +31,12 @@ public class Grass {
 
     public double getPercentageOfAbsoluteMax() {
         return kilocalories / MAX_KCAL;
+    }
+
+    /**
+     * @return true - если трава готова прорасти в соседней пустой клетке
+     */
+    public boolean isGoodForReproduction() {
+        return getKilocalories() >= maxKilocalories / 3;
     }
 }
