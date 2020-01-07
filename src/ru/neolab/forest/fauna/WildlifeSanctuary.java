@@ -115,6 +115,7 @@ public class WildlifeSanctuary {
             final List<Hare> beasts = getAliveBeast(whereBeast(wolf), Hare.class);
             if (beasts.size() == 0) continue;
             final Hare ateHare = beasts.get((int) (beasts.size() * Math.random()));
+            ateHares.add(ateHare);
             events.add(new Event.BeastAte(wolf, ateHare.getKilocalories()));
             beasts.remove(ateHare);
         }
