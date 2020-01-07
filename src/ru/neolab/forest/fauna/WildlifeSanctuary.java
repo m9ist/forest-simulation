@@ -38,10 +38,10 @@ public class WildlifeSanctuary {
         listeners.add(listener);
     }
 
-    //-------------------------------------- работа с движением и возможными координатами
+    //-------------------------------------- Г°Г ГЎГ®ГІГ  Г± Г¤ГўГЁГ¦ГҐГ­ГЁГҐГ¬ ГЁ ГўГ®Г§Г¬Г®Г¦Г­Г»Г¬ГЁ ГЄГ®Г®Г°Г¤ГЁГ­Г ГІГ Г¬ГЁ
 
     /**
-     * Задаются правила передвижения по полю. Можно здесь накидать препятствий, оврагов и пр и др и тд
+     * Г‡Г Г¤Г ГѕГІГ±Гї ГЇГ°Г ГўГЁГ«Г  ГЇГҐГ°ГҐГ¤ГўГЁГ¦ГҐГ­ГЁГї ГЇГ® ГЇГ®Г«Гѕ. ГЊГ®Г¦Г­Г® Г§Г¤ГҐГ±Гј Г­Г ГЄГЁГ¤Г ГІГј ГЇГ°ГҐГЇГїГІГ±ГІГўГЁГ©, Г®ГўГ°Г ГЈГ®Гў ГЁ ГЇГ° ГЁ Г¤Г° ГЁ ГІГ¤
      */
     private boolean possibleMove(final Coordinates from, final Coordinates to, final double speed) throws SanctuaryException {
         if (!checkIsPossible(from)) {
@@ -53,7 +53,7 @@ public class WildlifeSanctuary {
     }
 
     /**
-     * Задается геометрия поля, тут можно хоть круг нарисовать
+     * Г‡Г Г¤Г ГҐГІГ±Гї ГЈГҐГ®Г¬ГҐГІГ°ГЁГї ГЇГ®Г«Гї, ГІГіГІ Г¬Г®Г¦Г­Г® ГµГ®ГІГј ГЄГ°ГіГЈ Г­Г Г°ГЁГ±Г®ГўГ ГІГј
      */
     boolean checkIsPossible(final Coordinates coordinates) {
         return coordinates.x >= 0
@@ -88,19 +88,20 @@ public class WildlifeSanctuary {
         return coordinates;
     }
 
-    //-------------------------------------- итерации
+    //-------------------------------------- ГЁГІГҐГ°Г Г¶ГЁГЁ
     public void addBeast(final Beast beast, final Coordinates coordinates) {
         beasts.put(beast, new BeastSanctuaryState(beast, coordinates));
     }
 
     /**
-     * Проводим итерацию изменения мира. Пока мир наш прост, без эксцессов, все выбирают что он будут делать, потом
-     * это происходит.
+     * ГЏГ°Г®ГўГ®Г¤ГЁГ¬ ГЁГІГҐГ°Г Г¶ГЁГѕ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г¬ГЁГ°Г . ГЏГ®ГЄГ  Г¬ГЁГ° Г­Г Гё ГЇГ°Г®Г±ГІ, ГЎГҐГ§ ГЅГЄГ±Г¶ГҐГ±Г±Г®Гў, ГўГ±ГҐ ГўГ»ГЎГЁГ°Г ГѕГІ Г·ГІГ® Г®Г­ ГЎГіГ¤ГіГІ Г¤ГҐГ«Г ГІГј, ГЇГ®ГІГ®Г¬
+     * ГЅГІГ® ГЇГ°Г®ГЁГ±ГµГ®Г¤ГЁГІ.
      * <p>
-     * К примеру заяц сказал - буду двигаться туда, волк - буду размножаться, а травка - что она отрастет, а второй заяц -
-     * что буду жрать как не в себя и наслаждаться жизнью.
+     * ГЉ ГЇГ°ГЁГ¬ГҐГ°Гі Г§Г ГїГ¶ Г±ГЄГ Г§Г Г« - ГЎГіГ¤Гі Г¤ГўГЁГЈГ ГІГјГ±Гї ГІГіГ¤Г , ГўГ®Г«ГЄ - ГЎГіГ¤Гі Г°Г Г§Г¬Г­Г®Г¦Г ГІГјГ±Гї, Г  ГІГ°Г ГўГЄГ  - Г·ГІГ® Г®Г­Г  Г®ГІГ°Г Г±ГІГҐГІ, Г  ГўГІГ®Г°Г®Г© Г§Г ГїГ¶ -
+     * Г·ГІГ® ГЎГіГ¤Гі Г¦Г°Г ГІГј ГЄГ ГЄ Г­ГҐ Гў Г±ГҐГЎГї ГЁ Г­Г Г±Г«Г Г¦Г¤Г ГІГјГ±Гї Г¦ГЁГ§Г­ГјГѕ.
      */
     private void iteration() throws SanctuaryException {
+        List<Hare> ateHares = new ArrayList<Hare>();
         if (!events.isEmpty()) {
             throw new SanctuaryException("Not empty state");
         }
@@ -114,6 +115,7 @@ public class WildlifeSanctuary {
             final List<Hare> beasts = getAliveBeast(whereBeast(wolf), Hare.class);
             if (beasts.size() == 0) continue;
             final Hare ateHare = beasts.get((int) (beasts.size() * Math.random()));
+            ateHares.add(ateHare);
             events.add(new Event.BeastAte(wolf, ateHare.getKilocalories()));
             beasts.remove(ateHare);
         }
@@ -138,7 +140,7 @@ public class WildlifeSanctuary {
                 grass.stepDone(0);
             }
         }
-        // воспроизводство травы после того как ее всю съели
+        // ГўГ®Г±ГЇГ°Г®ГЁГ§ГўГ®Г¤Г±ГІГўГ® ГІГ°Г ГўГ» ГЇГ®Г±Г«ГҐ ГІГ®ГЈГ® ГЄГ ГЄ ГҐГҐ ГўГ±Гѕ Г±ГєГҐГ«ГЁ
         for (final Coordinates coordinate : grasses.keySet()) {
             final Grass grass = grasses.get(coordinate);
             if (grass.getKilocalories() <= 0) {
@@ -154,12 +156,18 @@ public class WildlifeSanctuary {
                 grass.growGrass(numPossibleParents);
             }
         }
-        // меняем этот мир....
+        // Г¬ГҐГ­ГїГҐГ¬ ГЅГІГ®ГІ Г¬ГЁГ°....
         for (final Event event : events) {
             if (event.beast.isDead()) continue;
             event.apply(this);
         }
         events.clear();
+        
+        if (!ateHares.isEmpty()) {
+            for (Hare ateHare : ateHares) {
+                this.beasts.remove(ateHare);
+            }
+        }
     }
 
     public void addEvent(final Event event) {
@@ -174,7 +182,7 @@ public class WildlifeSanctuary {
         return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
     }
 
-    //----------------------------------- реализация применения накопленных решений изменений мира
+    //----------------------------------- Г°ГҐГ Г«ГЁГ§Г Г¶ГЁГї ГЇГ°ГЁГ¬ГҐГ­ГҐГ­ГЁГї Г­Г ГЄГ®ГЇГ«ГҐГ­Г­Г»Гµ Г°ГҐГёГҐГ­ГЁГ© ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГ© Г¬ГЁГ°Г 
 
     void moveBeast(final Beast beast, final Coordinates to) throws SanctuaryException {
         final BeastSanctuaryState beastSanctuaryState = beasts.get(beast);
@@ -192,10 +200,10 @@ public class WildlifeSanctuary {
         beast.kilocaloriesAte(kilocalories);
     }
 
-    //----------------------------------- для прорисовки мира
+    //----------------------------------- Г¤Г«Гї ГЇГ°Г®Г°ГЁГ±Г®ГўГЄГЁ Г¬ГЁГ°Г 
 
     /**
-     * Получить животных в этой ячейке мира
+     * ГЏГ®Г«ГіГ·ГЁГІГј Г¦ГЁГўГ®ГІГ­Г»Гµ Гў ГЅГІГ®Г© ГїГ·ГҐГ©ГЄГҐ Г¬ГЁГ°Г 
      */
     public List<Beast> getBeasts(final Coordinates coordinate) {
         final ArrayList<Beast> out = new ArrayList<>();
